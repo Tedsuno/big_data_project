@@ -1,0 +1,29 @@
+# Fichiers spécifiques
+check.json
+
+# Dossiers de build
+build/
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg
+*.egg-info/
+.env
+.venv/
+venv/
+*.sqlite3
+
+# Fichiers Jupyter
+.ipynb_checkpoints
+
+# Logs
+*.log
+
+# VSCode
+.vscode/
+
+# Systèmes d'exploitation
+.DS_Store
+Thumbs.db

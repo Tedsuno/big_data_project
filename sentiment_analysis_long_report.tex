@@ -1,0 +1,135 @@
+
+\documentclass[10pt,twocolumn]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1.5cm}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{booktabs}
+
+\titleformat{\section}{\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+\captionsetup[figure]{labelfont=bf}
+
+\title{\textbf{Sentiment Analysis of Tweets: A Comparative Study of Lexicon-Based, SVM and LSTM Approaches}}
+\author{Amine Sekkat \\ Master in Computer Science - Data Science}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This report presents a comprehensive study on sentiment analysis of tweets, comparing three different approaches: a lexicon-based method (TextBlob), a classical machine learning model (SVM), and a deep learning model (LSTM). We evaluate these methods on a labeled Twitter dataset using metrics such as accuracy, precision, recall, and F1-score. The aim is to understand their respective strengths and weaknesses in dealing with short, noisy, and informal texts like tweets.
+\end{abstract}
+
+\section{Introduction}
+Sentiment analysis, also known as opinion mining, refers to the use of natural language processing (NLP), text analysis, and computational linguistics to identify and extract subjective information from textual data. It is widely applied in marketing, customer feedback, social media monitoring, and political analysis.
+
+Tweets represent a challenging domain for sentiment analysis due to their short length, use of slang, abbreviations, emojis, and lack of grammatical structure. Furthermore, tweets often include sarcasm or irony, making classification harder.
+
+This project explores three different sentiment analysis techniques:
+\begin{itemize}
+    \item \textbf{Lexicon-Based}: Based on sentiment polarity scores of words.
+    \item \textbf{SVM (Support Vector Machines)}: Classical machine learning using TF-IDF vectors.
+    \item \textbf{LSTM (Long Short-Term Memory)}: A deep learning model capable of capturing temporal dependencies in sequences.
+\end{itemize}
+
+\section{Related Work}
+Several research papers have proposed different approaches for sentiment analysis of tweets.
+
+\subsection{Lexicon-Based Approaches}
+Catelli et al. (2023) presented a lexicon-based sentiment analysis system applied to Italian tweets related to COVID-19. The method relies on predefined dictionaries to assign sentiment scores and does not require training. However, its performance depends heavily on the quality and completeness of the lexicon.
+
+\subsection{Machine Learning Approaches}
+Ahmad et al. (2017) employed SVMs for tweet classification. They used preprocessing and vectorization (TF-IDF) techniques to convert tweets into feature vectors. This approach is easy to implement and performs well on balanced datasets but struggles with unseen expressions and sarcasm.
+
+\subsection{Deep Learning Approaches}
+Roy et al. (2024) proposed an LSTM-based method for real-time sentiment detection. Their model outperformed classical approaches due to its ability to capture context over time. However, it requires a large dataset and significant computational resources for training.
+
+\subsection{Comparison and Positioning}
+While lexicon-based methods are fast and interpretable, they lack flexibility. SVMs offer good baseline performance but are limited in understanding context. LSTMs, although more complex, provide superior performance for sequential data, especially with enough data and tuning.
+
+\section{Problem Formulation}
+Let $D = \{(x_i, y_i)\}_{i=1}^{n}$ be a dataset of tweets, where $x_i$ is a tweet and $y_i \in \{positive, neutral, negative\}$. The objective is to learn a function $f: x \rightarrow y$ that generalizes well on unseen tweets.
+
+\section{Proposed Solution}
+\subsection{Lexicon-Based Model}
+We used TextBlob to compute the polarity of each tweet. A polarity score $> 0.25$ is labeled as positive, $< -0.25$ as negative, and in between as neutral.
+
+\subsection{SVM Classifier}
+Tweets were preprocessed and converted to TF-IDF vectors. A Linear SVM was trained using 80\% of the dataset and evaluated on the remaining 20\%.
+
+\subsection{LSTM Classifier}
+Tweets were tokenized and padded to fixed-length sequences. The model includes:
+\begin{itemize}
+    \item Embedding layer (5000 vocab, dim=128)
+    \item Dropout layer
+    \item LSTM layer with 196 units
+    \item Dense output layer with softmax activation
+\end{itemize}
+It was trained for 3 epochs using categorical cross-entropy loss and Adam optimizer.
+
+\section{Experiments}
+\subsection{Environment}
+Experiments were run on a Windows 10 machine with Python 3.10, TensorFlow 2.x, Scikit-learn, and TextBlob. No GPU was used.
+
+\subsection{Dataset}
+We used a CSV file of labeled tweets with the following columns: textID, text, selected\_text, sentiment. Only tweets with sentiment in \{positive, neutral, negative\} were kept. The dataset was split into 80\% training and 20\% testing.
+
+\subsection{Metrics}
+We evaluated each model using the following metrics:
+\begin{itemize}
+    \item \textbf{Accuracy}: ratio of correct predictions.
+    \item \textbf{Precision}: true positives / predicted positives.
+    \item \textbf{Recall}: true positives / actual positives.
+    \item \textbf{F1-score}: harmonic mean of precision and recall.
+\end{itemize}
+
+\subsection{Results}
+
+\begin{table}[H]
+\centering
+\caption{Performance Comparison}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-score} \\
+\midrule
+SVM     & 0.67 & 0.68 & 0.67 & 0.67 \\
+LSTM    & 0.70 & 0.71 & 0.70 & 0.70 \\
+Lexicon & 0.60 & 0.66 & 0.57 & 0.57 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Discussion}
+The LSTM model showed the best performance across all metrics. It was able to understand context and handle variable-length tweets effectively. However, it required more time to train and was more sensitive to hyperparameters.
+
+SVM offered a good trade-off between speed and accuracy. It performed reasonably well and is suitable for baseline classification.
+
+The lexicon-based method was the simplest to implement but had the lowest performance, especially on negative sentiments, likely due to missing or ambiguous words in the dictionary.
+
+\section{Conclusion}
+This study highlights the strengths and weaknesses of different sentiment analysis approaches on Twitter data. LSTMs provide the most accurate predictions but require computational resources and data. SVMs are fast and reliable for small to medium-sized datasets. Lexicon-based methods are lightweight but limited in accuracy.
+
+In future work, we plan to:
+\begin{itemize}
+    \item Extend the dataset and improve label balance.
+    \item Tune hyperparameters of the LSTM model.
+    \item Explore transformer-based models like BERT for comparison.
+\end{itemize}
+
+\section*{References}
+\begin{itemize}
+    \item Ahmad et al., \textit{Sentiment Analysis of Tweets using SVM}, IJCA, 2017.
+    \item Roy et al., \textit{Hateful Sentiment Detection in Real-Time Tweets}, 2024.
+    \item Catelli et al., \textit{Lexicon-based sentiment analysis for COVID-19}, Computers in Biology and Medicine, 2023.
+\end{itemize}
+
+\end{document}

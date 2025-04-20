@@ -1,7 +1,11 @@
 import pandas as pd
+#import certifi
 from textblob import TextBlob
 import re
 from pymongo import MongoClient
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 
 MONGO_URI = "mongodb+srv://Ayoub:BigData123@bigdataproject.0fq9v2b.mongodb.net/"
 DB_NAME = "sentiment_project"
@@ -79,9 +83,47 @@ def analyze_tweets(csv_file):
     # Return dataframe with relevant columns
     return df[['textID', 'text', 'selected_text', 'sentiment', 'predicted_sentiment']]
 
+def visualize_sentiment_analysis(df):
+    """
+    Generate visualizations to evaluate sentiment analysis performance.
+    Assumes df has columns: 'sentiment', 'predicted_sentiment', 'cleaned_text'
+    """
+    # Set style
+    sns.set(style="whitegrid", palette="muted", font_scale=1.1)
+
+    # 1. Confusion Matrix
+    plt.figure(figsize=(6, 5))
+    labels = ['positive', 'neutral', 'negative']
+    cm = confusion_matrix(df['sentiment'], df['predicted_sentiment'], labels=labels)
+    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=labels, yticklabels=labels)
+    plt.title('Confusion Matrix')
+    plt.xlabel('Predicted Sentiment')
+    plt.ylabel('Actual Sentiment')
+    plt.tight_layout()
+    plt.show()
+
+    # 2. Sentiment Distribution (Bar Plot)
+    plt.figure(figsize=(10, 5))
+
+    plt.subplot(1, 2, 1)
+    sns.countplot(data=df, x='sentiment', order=labels)
+    plt.title('Actual Sentiment Distribution')
+    plt.xlabel('Sentiment')
+    plt.ylabel('Count')
+
+    plt.subplot(1, 2, 2)
+    sns.countplot(data=df, x='predicted_sentiment', order=labels)
+    plt.title('Predicted Sentiment Distribution')
+    plt.xlabel('Sentiment')
+    plt.ylabel('Count')
+
+    plt.tight_layout()
+    plt.show()
+
 
 # Main entry point
 if __name__ == "__main__":
     file_path = "../../data/tweet.csv"  # Change this to the actual CSV file path
     result_df = analyze_tweets(file_path)
     print(result_df.head())  # Print the first few rows of the result
+    visualize_sentiment_analysis(result_df)

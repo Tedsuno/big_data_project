@@ -1,5 +1,5 @@
 import pandas as pd
-#import certifi
+import certifi
 from textblob import TextBlob
 import re
 from pymongo import MongoClient
@@ -37,16 +37,16 @@ def preprocess_text(text):
 
 
 # Function to classify sentiment as positive, neutral, or negative based on polarity
-def get_sentiment(text):
+def get_sentiment(text, threshold=0.25):
     if pd.isna(text):  # Handle missing or NaN values
         return "neutral"  # Default to neutral if text is missing
     analysis = TextBlob(str(text))  # Ensure text is converted to string
     polarity = analysis.sentiment.polarity
 
     # Classify based on polarity score
-    if polarity > 0.25:
+    if polarity > threshold:
         return "positive"
-    elif polarity < -0.25:
+    elif polarity < -threshold:
         return "negative"
     else:
         return "neutral"
@@ -81,7 +81,7 @@ def analyze_tweets(csv_file):
     print(f"Sentiment Analysis Accuracy: {accuracy:.2%}")
 
     # Return dataframe with relevant columns
-    return df[['textID', 'text', 'selected_text', 'sentiment', 'predicted_sentiment']]
+    return df[['textID', 'text', 'selected_text', 'sentiment', 'predicted_sentiment', 'cleaned_text']]
 
 def visualize_sentiment_analysis(df):
     """
@@ -120,6 +120,46 @@ def visualize_sentiment_analysis(df):
     plt.tight_layout()
     plt.show()
 
+    # 3. Accuracy vs Threshold (Bar Plot)
+    accuracy_scores = []
+    cleaned_texts = df['cleaned_text']
+    actual_sentiments = df['sentiment']
+
+    thresholds = [0, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4]
+
+    # Compute accuracy for each threshold
+    for t in thresholds:
+        predicted = cleaned_texts.apply(lambda x: get_sentiment(x, threshold=t))
+        accuracy = (predicted == actual_sentiments).mean()
+        accuracy_scores.append(accuracy)
+
+    # Create DataFrame for plotting
+    threshold_df = pd.DataFrame({
+        'Threshold': thresholds,
+        'Accuracy': accuracy_scores
+    })
+
+    # Find the best threshold for highlighting
+    best_idx = threshold_df['Accuracy'].idxmax()
+    best_threshold = threshold_df.loc[best_idx, 'Threshold']
+    best_accuracy = threshold_df.loc[best_idx, 'Accuracy']
+
+    # Plot
+    plt.figure(figsize=(10, 6))
+    bars = sns.barplot(data=threshold_df, x='Threshold', y='Accuracy', palette='Greens_d')
+
+    # Highlight best bar
+    bars.patches[best_idx].set_color('crimson')
+    plt.text(best_idx, best_accuracy + 0.01, f"{best_accuracy:.2%}",
+             ha='center', va='bottom', fontsize=10, fontweight='bold', color='crimson')
+
+    plt.title("Accuracy vs Sentiment Threshold (Bar Plot)")
+    plt.xlabel("Threshold")
+    plt.ylabel("Accuracy")
+    plt.ylim(0, 1)
+    plt.tight_layout()
+    plt.grid(axis='y')
+    plt.show()
 
 # Main entry point
 if __name__ == "__main__":

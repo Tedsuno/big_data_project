@@ -5,8 +5,24 @@ from sklearn.svm import LinearSVC
 from sklearn.metrics import classification_report
 import numpy as np
 
-# 1. Charger le fichier CSV
-df = pd.read_csv('../../data/tweet.csv')
+from pymongo import MongoClient
+
+MONGO_URI = "mongodb+srv://Ayoub:BigData123@bigdataproject.0fq9v2b.mongodb.net/"
+DB_NAME = "sentiment_project"
+COLLECTION_NAME = "tweets"
+
+print("🌍 Connecting to MongoDB Atlas...")
+# Se connecter à la base de données
+client = MongoClient(MONGO_URI)
+db = client[DB_NAME]
+collection = db[COLLECTION_NAME]
+print(f"✅ Connected to DB: '{DB_NAME}', Collection: '{COLLECTION_NAME}'")
+
+print("⬇️ Fetching data from MongoDB...")
+cursor = collection.find({}, {'_id': 0, 'text': 1, 'sentiment': 1})
+
+# Convertir les données récupérées en DataFrame pandas
+df = pd.DataFrame(list(cursor))
 
 
 # Supprimer les lignes où le texte est manquant

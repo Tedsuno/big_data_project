@@ -7,11 +7,6 @@ from sklearn.model_selection import train_test_split
 # Importer MongoClient
 from pymongo import MongoClient
 
-# --- Informations de connexion MongoDB ---
-# !!! ATTENTION : Ne mettez jamais d'identifiants sensibles directement
-# dans le code pour des applications réelles. Utilisez des variables
-# d'environnement ou des fichiers de configuration.
-# Pour cet exemple, nous les mettons ici pour la clarté.
 MONGO_URI = "mongodb+srv://Ayoub:BigData123@bigdataproject.0fq9v2b.mongodb.net/"
 DB_NAME = "sentiment_project"
 COLLECTION_NAME = "tweets"

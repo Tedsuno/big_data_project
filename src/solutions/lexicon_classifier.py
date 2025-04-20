@@ -1,6 +1,11 @@
 import pandas as pd
 from textblob import TextBlob
 import re
+from pymongo import MongoClient
+
+MONGO_URI = "mongodb+srv://Ayoub:BigData123@bigdataproject.0fq9v2b.mongodb.net/"
+DB_NAME = "sentiment_project"
+COLLECTION_NAME = "tweets"
 
 
 # Function to preprocess the text (clean the tweet)
@@ -45,11 +50,19 @@ def get_sentiment(text):
 
 # Function to analyze tweets from CSV file and calculate accuracy
 def analyze_tweets(csv_file):
-    df = pd.read_csv(csv_file)
 
-    # Check if necessary columns exist in the dataframe
-    if not {'textID', 'text', 'selected_text', 'sentiment'}.issubset(df.columns):
-        raise ValueError("CSV file must contain 'textID', 'text', 'selected_text', and 'sentiment' columns")
+    print("🌍 Connecting to MongoDB Atlas...")
+    # Se connecter à la base de données
+    client = MongoClient(MONGO_URI)
+    db = client[DB_NAME]
+    collection = db[COLLECTION_NAME]
+    print(f"✅ Connected to DB: '{DB_NAME}', Collection: '{COLLECTION_NAME}'")
+
+    print("⬇️ Fetching data from MongoDB...")
+    cursor = collection.find({}, {'_id': 0, 'text': 1, 'sentiment': 1, 'selected_text' : 1, 'textID' : 1 })
+
+    # Convertir les données récupérées en DataFrame pandas
+    df = pd.DataFrame(list(cursor))
 
     # Preprocess the tweets (cleaning the text)
     df['cleaned_text'] = df['selected_text'].apply(preprocess_text)

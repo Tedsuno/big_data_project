@@ -5,3 +5,5 @@ numpy
 scikit-learn
 statsmodels
 scipy
+dotenv
+pymongo

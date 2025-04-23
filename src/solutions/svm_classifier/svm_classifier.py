@@ -12,7 +12,7 @@ import os
 import joblib
 from pymongo import MongoClient
 from dotenv import load_dotenv
-from svm_plots import (
+from solutions.svm_classifier.svm_plots import (
     plot_class_metrics,
     plot_decision_scores,
     plot_text_length_vs_accuracy

@@ -12,11 +12,12 @@ import os
 import joblib
 from pymongo import MongoClient
 from dotenv import load_dotenv
-from solutions.svm_classifier.svm_plots import (
+from svm_plots import (
     plot_class_metrics,
     plot_decision_scores,
     plot_text_length_vs_accuracy
 )
+
 
 # --- Configuration ---
 load_dotenv()
@@ -38,18 +39,21 @@ def run_svm_classification(show_plots=True):
     client = None; df = None
     try:
         print("Connecting to MongoDB Atlas..."); client = MongoClient(MONGO_URI)
-        db = client[DB_NAME]; collection = db[COLLECTION_NAME] # Connection to MongoDB and Loading data
-        print(f"Connected.");
+        db = client[DB_NAME]
+        collection = db[COLLECTION_NAME] # Connection to MongoDB and loading data
+        print(f"Connected")
         cursor = collection.find({}, {'_id': 0, 'text': 1, 'sentiment': 1}) # We delete before the others field apart from 'text' and 'sentiment'
-        df = pd.DataFrame(list(cursor)); # We connect to our DB
+        df = pd.DataFrame(list(cursor)) # We connect to our DB
     except Exception as e: 
-        print(f"ERROR fetching data: {e}"); return
+        print(f"ERROR fetching data: {e}")
+        return
     finally:
         if client: 
-           client.close(); 
+           client.close()
            print("MongoDB connection closed.")
         if df is None or df.empty: 
-           print("No data loaded. EXIT"); return
+           print("No data loaded. EXIT")
+           return
 
     # Basic Cleaning ( # We delete the empty entry and take only the valid sentiment )
     df.dropna(subset=['text', 'sentiment'], inplace=True) 
@@ -108,19 +112,11 @@ def run_svm_classification(show_plots=True):
     print(f"\nSVM execution time: {end_time - start_time:.2f} seconds.")
 
     if show_plots:
-        print("\nGenerating and showing 3 analysis plots...")
         sns.set_style('whitegrid')
-
-        print("Plot 1 : Per-Class Metrics")
         plot_class_metrics(y_test, y_pred, labels)
-
-        print("Plot 2 : Decision Scores Distribution")
         plot_decision_scores(y_scores, y_test, labels)
-
-        print("Plot 3 : Text Length vs Classification Accuracy")
         plot_text_length_vs_accuracy(X_test, y_test, y_pred)
 
 
 if __name__ == "__main__":
-     # Run the function when the script is executed directly
-     run_svm_classification(show_plots=True) # Ensure plots are shown
+     run_svm_classification(show_plots=True)

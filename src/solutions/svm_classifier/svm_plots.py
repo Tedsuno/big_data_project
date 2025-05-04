@@ -12,6 +12,7 @@ def plot_class_metrics(y_test, y_pred, labels):
         for label in labels if label in report_dict
     }
 
+
     if class_metrics:
         df = pd.DataFrame(class_metrics).T.reset_index().rename(columns={'index': 'Sentiment'})
         df_melt = df.melt(id_vars='Sentiment', var_name='Metric', value_name='Score')

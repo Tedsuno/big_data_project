@@ -1,4 +1,3 @@
-# data_preprocessing.py
 import pandas as pd
 from tensorflow.keras.preprocessing.text import Tokenizer
 from tensorflow.keras.preprocessing.sequence import pad_sequences
@@ -47,4 +46,5 @@ def preprocess_data(max_len=28, vocab_size=5000, test_size=0.33, random_state=42
     finally:
         if client:
             client.close()
+            
             print("Connexion MongoDB fermée (preprocess_data).")

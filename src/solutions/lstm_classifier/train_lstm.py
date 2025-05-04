@@ -18,6 +18,7 @@ def print_results(validation_size, X_train, X_test, Y_train, Y_test, tokenizer,m
         if Y_validate.shape[1] == 2:  # Sortie softmax
             print("Detailed validation (softmax output)...")
             
+            
             y_true = np.argmax(Y_validate, axis=1)
             y_pred = np.argmax(model.predict(X_validate, verbose=0), axis=1)
 
